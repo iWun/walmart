@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1" user-scalable="no">
+
+    <style>
+        body {
+            background-color: #fff;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 16px;
+            color: #000;
+        }
+
+        a:link,
+        a:visited {
+            color: #4682b4;
+        }
+
+        a:hover {
+            color: #4169e1;
+        }
+
+        #main {
+            width: 800px;
+            height: 600px;
+            margin: auto;
+        }
+    </style>
+
+    <!--<script src="./js/jquery.js"></script>-->
+    <!--<script src="./js/echarts.js"></script>-->
+
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/echarts/3.6.2/echarts.js"></script>
+</head>
+
+<body>
+    <div id="main">
+
+    </div>
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('main'));
+
+        // Specify configurations and data graphs 
+        myChart.showLoading();
+
+        $.get('./data/USA_geo.json', function (usaJson) {
+
+
+            echarts.registerMap('USA', usaJson, {
+                Alaska: {              // 把阿拉斯加移到美国主大陆左下方
+                    left: -131,
+                    top: 25,
+                    width: 15
+                },
+                Hawaii: {
+                    left: -110,        // 夏威夷
+                    top: 28,
+                    width: 5
+                },
+                'Puerto Rico': {       // 波多黎各
+                    left: -76,
+                    top: 26,
+                    width: 2
+                }
+            });
+
+            $.get('./data/walmarts1_min.json', function (data) {
+                myChart.hideLoading();
+
+                option = {
+                    baseOption: {
+                        timeline: {
+                            loop: false,
+                            axisType: 'category',
+                            show: true,
+                            autoPlay: true,
+                            playInterval: 1500,
+                            label: {
+                                normal: {
+                                    textStyle: {
+                                        color: '#999'
+                                    }
+                                },
+                                emphasis: {
+                                    textStyle: {
+                                        color: '#fff'
+                                    }
+                                }
+                            },
+                            symbol: 'none',
+                            lineStyle: {
+                                color: '#555'
+                            },
+                            checkpointStyle: {
+                                color: '#bbb',
+                                borderColor: '#777',
+                                borderWidth: 2
+                            },
+                            controlStyle: {
+                                showNextBtn: false,
+                                showPrevBtn: false,
+                                normal: {
+                                    color: '#666',
+                                    borderColor: '#666'
+                                },
+                                emphasis: {
+                                    color: '#aaa',
+                                    borderColor: '#aaa'
+                                }
+                            },
+                            data: []
+                        },
+                        backgroundColor: '#404a59',
+                        title: {
+                            text: '',
+                            subtext: '',
+                            sublink: '',
+                            x: 'center',
+                            textStyle: {
+                                fontSize: 26,
+                                color: '#fff'
+                            }
+                        },
+                        tooltip: {
+                            trigger: 'item',
+                            showDelay: 0,
+                            transitionDuration: 0.2,
+                            formatter: function (params) {
+
+                                return '时间：' + params.seriesName + '<br/>' +
+                                    '名称：' + params.data.name + '<br/>' +
+                                    '地点： ' + '(' + params.data.value[0] + ',' + params.data.value[1] + ')';
+                            }
+                        },
+                        toolbox: {
+                            show: true,
+                            left: 'left',
+                            top: 'top',
+                            feature: {
+                                mark: { show: true },
+                                dataView: { show: true, readOnly: false },
+                                restore: { show: true },
+                                saveAsImage: { show: true }
+                            }
+                        },
+                        geo: {
+                            map: 'USA',
+                            label: {
+                                emphasis: {
+                                    show: false
+                                }
+                            },
+                            itemStyle: {
+                                normal: {
+                                    areaColor: '#323c48',
+                                    borderColor: '#111'
+                                },
+                                emphasis: {
+                                    areaColor: '#2a333d'
+                                }
+                            }
+                        },
+                        series: [
+                            {
+                                type: 'scatter',
+                                coordinateSystem: 'geo',
+                                symbolSize: 6,
+                                label: {
+                                    normal: {
+                                        show: false
+                                    },
+                                    emphasis: {
+                                        show: false
+                                    }
+                                },
+                                itemStyle: {
+                                    emphasis: {
+                                        borderColor: '#fff',
+                                        borderWidth: 1
+                                    }
+                                },
+                                animationEasing: 'elasticOut'
+                            }
+                        ]
+                    },
+                    options: []
+                };
+
+                if (typeof data === 'string') {
+                    data = JSON.parse(data);
+                }
+                var temp = [];
+                for (var n = 0; n < data.timeline.length; n++) {
+                    temp = data.series[n].concat(temp);
+                    option.baseOption.timeline.data.push(data.timeline[n]);
+                    option.options.push({
+                        title: {
+                            show: true,
+                            'text': '一张图，看沃尔玛扩张（' + data.timeline[n] + '）'
+                        },
+                        series: {
+                            name: data.timeline[n],
+                            data: temp
+                        }
+                    });
+                }
+
+                myChart.setOption(option);
+            });
+        });
+    </script>
+</body>
+
+</html>

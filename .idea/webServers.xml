@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="dd69300b-5f5e-4321-844b-a914b4be3960" name="119.29.134.43" url="http://119.29.134.43">
+        <fileTransfer host="119.29.134.43" port="22" rootFolder="/var/www/html/walmart" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
